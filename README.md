@@ -88,13 +88,19 @@ Add the following to the backend .env file:
 
 
 MONGO_URL=your_mongodb_url
+
 JWT_SECRET=your_jwt_secret
+
 CLOUD_NAME=your_cloudinary_name
+
 CLOUD_API_KEY=your_cloudinary_api_key
+
 CLOUD_API_SECRET=your_cloudinary_api_secret
+
 PORT=5000
 
 Installation
+
 Clone the Repository
 
 git clone https://github.com/CODING-ENJOY154/BOOK.git
@@ -108,13 +114,19 @@ cd backend
 npm install
 
 cd ..
+
 cd frontend
+
 npm install
+
 Start Frontend
+
 Make sure you are in frontend directory:
 npm run dev
 
 Start Backend
 Make sure you are in backend directory:
+
 node index.js
+
  localhost:5173 
