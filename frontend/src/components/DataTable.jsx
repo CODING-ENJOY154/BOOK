@@ -20,12 +20,15 @@ import DataTableToolbar from "./DataTableToolbar";
 import DataTablePagination from "./DataTablePagination";
 
 export function DataTable({ columns, data, children, searchBy = "name" }) {
+  // Ensure data is always an array to prevent errors
+  const safeData = data ?? [];
+
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
 
   const table = useReactTable({
-    data,
+    data: safeData,
     columns,
     state: {
       sorting,
@@ -56,27 +59,26 @@ export function DataTable({ columns, data, children, searchBy = "name" }) {
         <TableHeader className="border-b-2">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}>
+                data-state={row.getIsSelected() && "selected"}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="z-0">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

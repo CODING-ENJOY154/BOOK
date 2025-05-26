@@ -5,22 +5,28 @@ import useUserData from "@/hooks/useUserData";
 import { useGoogleOneTapLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { toast } from "sonner";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useUserData();
+
   useEffect(() => {
     const logVisit = async () => {
-      const userAgent = navigator.userAgent;
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/log-visit`,
-        {
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+        console.log("Backend URL:", backendUrl);
+
+        const userAgent = navigator.userAgent;
+        const { data } = await axios.post(`${backendUrl}/log-visit`, {
           userAgent,
-        }
-      );
-      console.log(`Total unique visitors: ${data.totalVisitors}.`);
-      console.log(`You have visited ${data.totalVisits} time(s).`);
+        });
+
+        console.log(`Total unique visitors: ${data.totalVisitors}.`);
+        console.log(`You have visited ${data.totalVisits} time(s).`);
+      } catch (error) {
+        console.error("Failed to log visit:", error);
+      }
     };
     logVisit();
   }, []);
@@ -28,12 +34,13 @@ function App() {
   useGoogleOneTapLogin({
     onSuccess: async (credentialResponse) => {
       let promise = axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/users/google-auth`,
+        `${import.meta.env.VITE_BACKEND_URL || "http://localhost:8000"}/users/google-auth`,
         {
           token: credentialResponse.credential,
           auth_method: "google",
         }
       );
+
       toast.promise(promise, {
         loading: "Loading...",
         success: (response) => {
@@ -42,7 +49,7 @@ function App() {
           setIsLoggedIn(true);
           return response.data.message;
         },
-        error: (error) => error.response.data.message,
+        error: (error) => error.response?.data?.message || "Login failed",
       });
     },
     auto_select: true,
@@ -56,9 +63,7 @@ function App() {
       <div className="flex flex-col min-h-dvh sm:pl-14">
         <Header />
         <Outlet />
-
         <div className="flex-1"></div>
-
         <Footer />
       </div>
     </div>
